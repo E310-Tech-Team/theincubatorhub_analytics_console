@@ -48,7 +48,7 @@ function PaceBadge({ status }: { status: OpsAgentStatus }) {
 const num = (n: number) => n.toLocaleString();
 
 export default function Operations() {
-  const { isAdmin } = useAuth();
+  const { canView, isViewer } = useAuth();
   const queryClient = useQueryClient();
   const reduced = useReducedMotion();
   const [date, setDate] = useState('');
@@ -188,7 +188,7 @@ export default function Operations() {
         actions={
           <>
             <Input type="date" className="w-40 rounded-xl" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Date" />
-            {isAdmin ? (
+            {canView ? (
               <Button variant="outline" onClick={() => exportMut.mutate()} disabled={exportMut.isPending}>
                 <Download className="h-4 w-4" />
                 Export
@@ -329,8 +329,8 @@ export default function Operations() {
           </section>
         )}
 
-        {/* My activity (write) */}
-        {!loading && (
+        {/* My activity (write) — not for viewers, who change nothing */}
+        {!loading && !isViewer && (
           <section className="space-y-3">
             <h2 className="text-sm font-semibold text-gray-700">My activity today</h2>
             <Card className="p-6">
@@ -381,8 +381,8 @@ export default function Operations() {
           </section>
         )}
 
-        {/* Checklist (write) */}
-        {!loading && data.checklist.groups.length > 0 && (
+        {/* Checklist (write) — not for viewers */}
+        {!loading && !isViewer && data.checklist.groups.length > 0 && (
           <section className="space-y-3">
             <h2 className="text-sm font-semibold text-gray-700">Daily reporting checklist</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

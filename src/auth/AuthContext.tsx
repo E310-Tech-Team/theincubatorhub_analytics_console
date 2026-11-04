@@ -2,13 +2,21 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { AuthUser } from '@/api/auth';
 import { fetchMe, login as apiLogin, logout as apiLogout } from '@/api/auth';
 
-/** Roles that may use the console. Reports/Marketing are admin-only; Operations is staff. */
-export type Role = 'admin' | 'agent';
+/**
+ * Roles that may use the console. Reports are for admins and viewers (who see
+ * everything and change nothing — the server refuses a viewer's writes);
+ * Operations is staff.
+ */
+export type Role = 'admin' | 'agent' | 'viewer';
 
 interface AuthContextValue {
   user: AuthUser | null;
   isAdmin: boolean;
-  /** admin or agent — may access the console (Operations). */
+  /** Sees every report and download, changes nothing. */
+  isViewer: boolean;
+  /** admin or viewer — may open every report. */
+  canView: boolean;
+  /** admin, agent or viewer — may access the console (Operations). */
   isStaff: boolean;
   /** True once the initial session check (rehydrate) has resolved. */
   ready: boolean;
@@ -71,7 +79,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextValue = {
     user,
     isAdmin: user?.role === 'admin',
-    isStaff: user?.role === 'admin' || user?.role === 'agent',
+    isViewer: user?.role === 'viewer',
+    canView: user?.role === 'admin' || user?.role === 'viewer',
+    isStaff: user?.role === 'admin' || user?.role === 'agent' || user?.role === 'viewer',
     ready,
     login,
     logout,

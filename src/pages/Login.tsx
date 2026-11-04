@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
  * authenticates is immediately logged back out with a clear message.
  */
 export default function Login() {
-  const { ready, isAdmin, isStaff, login, logout } = useAuth();
+  const { ready, canView, isStaff, login, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,7 +31,7 @@ export default function Login() {
 
   // Already an authenticated staff member — skip the form.
   if (ready && isStaff) {
-    return <Navigate to={destFor(isAdmin)} replace />;
+    return <Navigate to={destFor(canView)} replace />;
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -40,8 +40,8 @@ export default function Login() {
     setBusy(true);
     try {
       const user = await login(email.trim(), password);
-      const admin = user.role === 'admin';
-      if (user.role !== 'admin' && user.role !== 'agent') {
+      const admin = user.role === 'admin' || user.role === 'viewer';
+      if (user.role !== 'admin' && user.role !== 'agent' && user.role !== 'viewer') {
         await logout();
         setError('This console is for Incubator staff only.');
         return;

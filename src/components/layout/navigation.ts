@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 /** Roles allowed to use the console (mirrors AuthContext Role). */
-export type NavRole = 'admin' | 'agent';
+export type NavRole = 'admin' | 'agent' | 'viewer';
 
 export interface NavItem {
   /** Plain-language label shown in the sidebar. */
@@ -97,14 +97,14 @@ export const navSections: NavSection[] = [
     id: 'operations',
     label: 'Operations',
     icon: ClipboardList,
-    roles: ['admin', 'agent'],
+    roles: ['admin', 'agent', 'viewer'],
     items: [
       {
         label: 'Daily operations',
         path: '/operations',
         icon: ClipboardList,
         explainer: 'Sprint funnel, daily targets, pace, and team activity.',
-        roles: ['admin', 'agent'],
+        roles: ['admin', 'agent', 'viewer'],
       },
     ],
   },
@@ -162,7 +162,7 @@ export function sectionIdForPath(pathname: string): string | undefined {
 
 /**
  * Sections (and their items) visible to a given role. Unspecified `roles` default
- * to admin-only; agent-visible sections (Operations) opt in via
+ * to admins and viewers; agent-visible sections (Operations) opt in via
  * `roles: ['admin','agent']`.
  */
 export function visibleSections(role: NavRole | undefined): NavSection[] {
@@ -170,7 +170,7 @@ export function visibleSections(role: NavRole | undefined): NavSection[] {
   return navSections
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => (item.roles ?? ['admin']).includes(role)),
+      items: section.items.filter((item) => (item.roles ?? ['admin', 'viewer']).includes(role)),
     }))
-    .filter((section) => (section.roles ?? ['admin']).includes(role) && section.items.length > 0);
+    .filter((section) => (section.roles ?? ['admin', 'viewer']).includes(role) && section.items.length > 0);
 }

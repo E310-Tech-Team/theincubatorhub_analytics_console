@@ -51,7 +51,7 @@ export default function App() {
           {import.meta.env.DEV && (
             <Route path="/dev/components" element={<ComponentsShowcase />} />
           )}
-          <Route element={<RequireRole roles={['admin']} />}>
+          <Route element={<RequireRole roles={['admin', 'viewer']} />}>
             <Route element={<AppShell />}>
               <Route path="/" element={<Navigate to="/reports/overview" replace />} />
               <Route path="/reports" element={<Navigate to="/reports/overview" replace />} />
@@ -66,8 +66,8 @@ export default function App() {
               <Route path="/help" element={<Help />} />
             </Route>
           </Route>
-          {/* Operations is staff-accessible (admin + agent). */}
-          <Route element={<RequireRole roles={['admin', 'agent']} />}>
+          {/* Operations is staff-accessible (admin + agent; viewers read it). */}
+          <Route element={<RequireRole roles={['admin', 'agent', 'viewer']} />}>
             <Route element={<AppShell />}>
               <Route path="/operations" element={<Operations />} />
             </Route>
